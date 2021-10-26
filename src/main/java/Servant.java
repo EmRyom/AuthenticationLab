@@ -67,7 +67,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String authenticate(String username, String password) throws IOException {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/passwords.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("../resources/passwords.txt"))) {
             String lineInPasswordFile;
             while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
                 String[] splitStr = lineInPasswordFile.split("\\s+");
@@ -75,6 +75,18 @@ public class Servant extends UnicastRemoteObject implements Print {
                 System.out.println("Password: " + splitStr[1]);
                 if (splitStr[0].equals(username) && splitStr[1].equals(password)) {
                     return username + " authenticated.";
+                }
+            }
+        } catch (Exception e) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/passwords.txt"))) {
+                String lineInPasswordFile;
+                while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
+                    String[] splitStr = lineInPasswordFile.split("\\s+");
+                    System.out.println("Username: " + splitStr[0]);
+                    System.out.println("Password: " + splitStr[1]);
+                    if (splitStr[0].equals(username) && splitStr[1].equals(password)) {
+                        return username + " authenticated.";
+                    }
                 }
             }
         }
