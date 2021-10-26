@@ -84,21 +84,25 @@ public class Servant extends UnicastRemoteObject implements Print {
     }
 
     private boolean compareUserInput(BufferedReader bufferedReader, String username, String password) throws IOException {
-        String lineInPasswordFile;
-        while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
-            String[] splitStr = lineInPasswordFile.split("\\s+");
-            System.out.println("Username: " + splitStr[0]);
-            System.out.println("Password: " + splitStr[1]);
-            if (splitStr[0].equals(username)) {
-                bufferedReader.close();
-                //String bCryptPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
-                //System.out.println(bCryptPassword + " password");
-                Boolean comparePasswords = BCrypt.checkpw(password, splitStr[1]);
-                if (comparePasswords) {
-                    return true;
+        try {
+            String lineInPasswordFile;
+            while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
+                String[] splitStr = lineInPasswordFile.split("\\s+");
+                System.out.println("Username: " + splitStr[0]);
+                System.out.println("Password: " + splitStr[1]);
+                if (splitStr[0].equals(username)) {
+                    bufferedReader.close();
+                    //String bCryptPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
+                    //System.out.println(bCryptPassword + " password");
+                    Boolean comparePasswords = BCrypt.checkpw(password, splitStr[1]);
+                    if (comparePasswords) {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return false;
     }
