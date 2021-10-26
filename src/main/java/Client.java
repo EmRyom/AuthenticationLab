@@ -5,6 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
+
 public class Client {
     public static void main(String[] args) throws IOException, NotBoundException {
         Print print = (Print) Naming.lookup("rmi://localhost:5099/connect");
@@ -103,7 +104,7 @@ public class Client {
                 System.out.println("Thank you. Now please enter your password");
                 String password = scanner.nextLine();
                 System.out.println("Thank you. Processing your authentication.");
-                authenticationString = print.authenticate(username, password);
+                authenticationString = print.authenticateUser(username, password);
                 if (authenticationString.equals("None")) {
                     System.out.println("You entered incorrect credentials. Please enter them again.");
                 } else {

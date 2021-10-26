@@ -15,5 +15,5 @@ public interface Print extends Remote {
     String status(String printer) throws RemoteException;  // prints status of printer on the user's display
     String readConfig(String parameter) throws RemoteException;   // prints the value of the parameter on the user's display
     void setConfig(String parameter, String value) throws RemoteException;   // sets the parameter to value
-    String authenticate(String username, String password) throws IOException;
+    String authenticateUser(String username, String password) throws IOException;
 }

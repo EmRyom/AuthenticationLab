@@ -8,6 +8,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 public class Servant extends UnicastRemoteObject implements Print {
 
@@ -66,30 +68,38 @@ public class Servant extends UnicastRemoteObject implements Print {
     }
 
     @Override
-    public String authenticate(String username, String password) throws IOException {
+    public String authenticateUser(String username, String password) throws IOException {
+        boolean isAuthenticated;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("../resources/passwords.txt"))) {
-            String lineInPasswordFile;
-            while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
-                String[] splitStr = lineInPasswordFile.split("\\s+");
-                System.out.println("Username: " + splitStr[0]);
-                System.out.println("Password: " + splitStr[1]);
-                if (splitStr[0].equals(username) && splitStr[1].equals(password)) {
-                    return username + " authenticated.";
-                }
-            }
+            isAuthenticated = compareUserInput(bufferedReader, username, password);
         } catch (Exception e) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/passwords.txt"))) {
-                String lineInPasswordFile;
-                while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
-                    String[] splitStr = lineInPasswordFile.split("\\s+");
-                    System.out.println("Username: " + splitStr[0]);
-                    System.out.println("Password: " + splitStr[1]);
-                    if (splitStr[0].equals(username) && splitStr[1].equals(password)) {
-                        return username + " authenticated.";
-                    }
-                }
+                isAuthenticated = compareUserInput(bufferedReader, username, password);
             }
         }
+        if (isAuthenticated) {
+            return username + " authenticated.";
+        }
         return "None";
+    }
+
+    private boolean compareUserInput(BufferedReader bufferedReader, String username, String password) throws IOException {
+        String lineInPasswordFile;
+        while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
+            String[] splitStr = lineInPasswordFile.split("\\s+");
+            System.out.println("Username: " + splitStr[0]);
+            System.out.println("Password: " + splitStr[1]);
+            if (splitStr[0].equals(username)) {
+                bufferedReader.close();
+                //String bCryptPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
+                //System.out.println(bCryptPassword + " password");
+                Boolean comparePasswords = BCrypt.checkpw(password, splitStr[1]);
+                if (comparePasswords) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
     }
 }
