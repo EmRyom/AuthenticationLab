@@ -4,15 +4,17 @@
 ### Open terminal and run
 $ cd \<directory>
 
-$ javac ApplicationServer.java Client.java Print.java Servant.java
+### Where directory is the location of the java files. Should be in src/main/java
 
-$ java ApplicationServer
+$ javac -cp "../../../jBCrypt/jBCrypt.jar;" ApplicationServer.java Client.java Servant.java Print.java
+
+$ java -cp "../../../jBCrypt/jBCrypt.jar;" ApplicationServer
 
 ### Open another terminal and run
 
 $ cd \<directory>
 
-$ java Client
+$ java -cp "../../../jBCrypt/jBCrypt.jar;" Client
 
 
 ## Current possible logins:
