@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -13,8 +14,25 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class Servant extends UnicastRemoteObject implements Print {
 
-    public Servant() throws RemoteException {
-        super();
+    ArrayList<Printer> printers = new ArrayList<>();
+    String parameter;
+
+
+
+
+    private int FindPrinter (String printer) {
+        for (int i = printers.size()-1; i > -1; i--) {
+            if (printers.get(i).name.equals(printer)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public Servant(String parameter) throws RemoteException {
+        this.parameter = parameter;
+
+
     }
 
     @Override
@@ -24,27 +42,46 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public void print(String filename, String printer) throws RemoteException {
-
+        int i = FindPrinter(printer);
+        if (i==-1) {
+            Printer p = new Printer(printer);
+            p.addToQueue(filename);
+            this.printers.add(p);
+        } else {
+            printers.get(i).addToQueue(filename);
+        }
+        System.out.println("Print: "+filename+" on "+printer);
     }
 
     @Override
     public ArrayList queue(String printer) throws RemoteException {
-        return null;
+        System.out.println("Queue: "+printer);
+        int i = FindPrinter(printer);
+        if (i==-1) {
+            ArrayList<Integer> u = new ArrayList<>();
+            return u;
+        }
+        return printers.get(i).Queue;
     }
 
     @Override
     public void topQueue(String printer, int job) throws RemoteException {
-
+        System.out.println("Top queue "+printer+" was demanded");
+        int i = FindPrinter(printer);
+        if (i==-1) {
+        } else {
+            printers.get(i).moveToTop(job);
+        }
     }
 
     @Override
     public void start() throws RemoteException {
-        System.out.println("Test");
+        System.out.println("Start server");
     }
 
     @Override
     public void stop() throws RemoteException {
-
+        System.out.println("Stop server");
     }
 
     @Override
@@ -54,7 +91,14 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String status(String printer) throws RemoteException {
-        return null;
+        System.out.println("Status: "+printer);
+        int i = FindPrinter(printer);
+        if (i==-1) {
+            return "Printer "+printer+" doesn't exist";
+        } else {
+            return printers.get(i).status();
+        }
+
     }
 
     @Override

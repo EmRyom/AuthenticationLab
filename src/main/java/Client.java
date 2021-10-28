@@ -3,6 +3,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -42,7 +43,11 @@ public class Client {
                                 "\nPlease enter the printer you wish to queue into.");
                         String printer2 = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        print.queue(printer2);
+                        ArrayList queue = print.queue(printer2);
+                        System.out.println("Job, File name"+queue.size());
+                        for (int i = queue.size(); i>0; i--) {
+                            System.out.println((i)+" "+queue.get(i-1));
+                        }
                         break;
                     case "3":
                         System.out.println("You've chosen to top queue." +
@@ -71,9 +76,10 @@ public class Client {
                         break;
                     case "7":
                         System.out.println("You've chosen to status." +
-                                "\nProcessing your request.");
-                        String status = print.status(authenticationString);
-                        System.out.println("The status of the printer is " + status + ".");
+                                "\nPlease enter the printer you wish to check status on.");
+                        printer3 = scanner.nextLine();
+                        System.out.println("Thank you. Processing your request.");
+                        System.out.println(print.status(printer3));
                         break;
                     case "8":
                         System.out.println("You've chosen to read config." +
