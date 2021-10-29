@@ -156,19 +156,25 @@ public class Servant extends UnicastRemoteObject implements Print {
             String lineInPasswordFile;
             while ((lineInPasswordFile = bufferedReader.readLine()) != null) {
                 String[] splitStr = lineInPasswordFile.split("\\s+");
-                System.out.println("Username: " + splitStr[0]);
-                System.out.println("Password: " + splitStr[1]);
+                //System.out.println("Username: " + splitStr[0]);
+                //System.out.println("Password: " + splitStr[1]);
                 if (splitStr[0].equals(username)) {
+                    System.out.println("Client credentials recieved.\n" +
+                            "Username: " + username +
+                            "\nPassword: " + password);
                     bufferedReader.close();
                     //String bCryptPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
                     //System.out.println(bCryptPassword + " password");
                     Boolean comparePasswords = BCrypt.checkpw(password, splitStr[1]);
                     if (comparePasswords) {
+                        System.out.println("Input credentials correct. User authenticated.");
                         return true;
                     }
+                    System.out.println("Input credentials incorrect. User authentication denied.");
                     return false;
                 }
             }
+            System.out.println("No user \'" + username + "\' exists in the system.");
         } catch (IOException e) {
             e.printStackTrace();
         }
