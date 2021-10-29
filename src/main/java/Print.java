@@ -7,8 +7,8 @@ import java.util.ArrayList;
 public interface Print extends Remote {
     String echo(String input) throws RemoteException;
     void print(String filename, String printer) throws RemoteException;   // prints file filename on the specified printer
-    ArrayList queue(String printer) throws RemoteException;   // lists the print queue for a given printer on the user's display in lines of the form <job number>   <file name>
-    void topQueue(String printer, int job) throws RemoteException;   // moves job to the top of the queue
+    String queue(String printer) throws RemoteException;   // lists the print queue for a given printer on the user's display in lines of the form <job number>   <file name>
+    String topQueue(String printer, int job) throws RemoteException;   // moves job to the top of the queue
     void start() throws RemoteException;   // starts the print server
     void stop() throws RemoteException;   // stops the print server
     void restart() throws RemoteException;   // stops the print server, clears the print queue and starts the print server again

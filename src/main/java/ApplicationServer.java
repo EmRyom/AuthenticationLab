@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 public class ApplicationServer {
     public static void main(String[] args) throws RemoteException {
         Registry registry = LocateRegistry.createRegistry(5099);
-        registry.rebind("connect", new Servant("A4,B/W"));
+        registry.rebind("connect", new Servant());
         System.out.println("Server is up and running.");
     }
 }

@@ -13,10 +13,15 @@ public class Printer {
         Queue.add(filename);
     }
 
-    public void moveToTop (int job) {
-        String file = this.Queue.get(job);
-        this.Queue.remove(job);
-        this.Queue.add(0,file);
+    public boolean moveToTop (int job) {
+        if (job>=Queue.size()) {
+            return false;
+        } else {
+            String file = this.Queue.get(job - 1);
+            this.Queue.remove(job - 1);
+            this.Queue.add(0, file);
+            return true;
+        }
     }
 
     public String status () {

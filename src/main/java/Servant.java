@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.mindrot.jbcrypt.BCrypt;
@@ -15,7 +16,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class Servant extends UnicastRemoteObject implements Print {
 
     ArrayList<Printer> printers = new ArrayList<>();
-    String parameter;
+    HashMap<String,String> parameters= new HashMap<String,String>();
 
 
 
@@ -29,9 +30,7 @@ public class Servant extends UnicastRemoteObject implements Print {
         return -1;
     }
 
-    public Servant(String parameter) throws RemoteException {
-        this.parameter = parameter;
-
+    public Servant() throws RemoteException {
 
     }
 
@@ -54,39 +53,57 @@ public class Servant extends UnicastRemoteObject implements Print {
     }
 
     @Override
-    public ArrayList queue(String printer) throws RemoteException {
+    public String queue(String printer) throws RemoteException {
         System.out.println("Queue: "+printer);
-        int i = FindPrinter(printer);
-        if (i==-1) {
-            ArrayList<Integer> u = new ArrayList<>();
-            return u;
+        int u = FindPrinter(printer);
+        if (u==-1) {
+            return "Printer "+printer+" doesn't exist";
         }
-        return printers.get(i).Queue;
+        ArrayList queue = printers.get(u).Queue;
+        String s ="Job|Filename\n";
+        for (int i = queue.size(); i>0; i--) {
+            s=s+((queue.size()-i+1)+"|"+queue.get(queue.size()-i)+"\n");
+        }
+        return s;
     }
 
     @Override
-    public void topQueue(String printer, int job) throws RemoteException {
-        System.out.println("Top queue "+printer+" was demanded");
+    public String topQueue(String printer, int job) throws RemoteException {
+        System.out.println("Top queue for job "+job+" on "+printer+" was demanded");
         int i = FindPrinter(printer);
         if (i==-1) {
+            return "Cannot more job "+job+" as "+printer+" doesn't exist";
         } else {
-            printers.get(i).moveToTop(job);
+            if (printers.get(i).moveToTop(job)) {
+                return "topQueue for job "+job+" on printer "+printer+" successful";
+            } else {
+                return "Cannot more job "+job+" on "+printer+", index too high";
+            }
         }
     }
 
     @Override
     public void start() throws RemoteException {
-        System.out.println("Start server");
+        System.out.println("Start server (connecting to printer1, printer2 and printer3)");
+        Printer p1 = new Printer("printer1");
+        Printer p2 = new Printer("printer2");
+        Printer p3 = new Printer("printer3");
+        printers.add(p1);
+        printers.add(p2);
+        printers.add(p3);
     }
 
     @Override
     public void stop() throws RemoteException {
-        System.out.println("Stop server");
+        printers = new ArrayList<>();
+        System.out.println("Stop server (Disconnecting from all printers)");
     }
 
     @Override
     public void restart() throws RemoteException {
-
+        stop();
+        start();
+        System.out.println("Restart");
     }
 
     @Override
@@ -103,12 +120,19 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String readConfig(String parameter) throws RemoteException {
-        return null;
+        System.out.println("Read config: "+parameter);
+        String out = parameters.get(parameter);
+        if (out!=null) {
+            return parameter+" is set to "+out;
+        } else {
+            return parameter+" doesn't exist";
+        }
     }
 
     @Override
     public void setConfig(String parameter, String value) throws RemoteException {
-
+        System.out.println("Set config: "+parameter+" to "+value);
+        parameters.put(parameter,value);
     }
 
     @Override

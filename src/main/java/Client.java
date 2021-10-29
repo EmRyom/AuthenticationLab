@@ -40,14 +40,10 @@ public class Client {
                         break;
                     case "2":
                         System.out.println("You've chosen to queue." +
-                                "\nPlease enter the printer you wish to queue into.");
+                                "\nPlease enter the printer you wish to see the queue of.");
                         String printer2 = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        ArrayList queue = print.queue(printer2);
-                        System.out.println("Job, File name"+queue.size());
-                        for (int i = queue.size(); i>0; i--) {
-                            System.out.println((i)+" "+queue.get(i-1));
-                        }
+                        System.out.println(print.queue(printer2));
                         break;
                     case "3":
                         System.out.println("You've chosen to top queue." +
@@ -56,10 +52,9 @@ public class Client {
                         System.out.println("Thank you. Now please enter the job number.");
                         int job = Integer.parseInt(scanner.nextLine());
                         System.out.println("Thank you. Processing your request.");
-                        print.topQueue(printer3, job);
+                        System.out.println(print.topQueue(printer3, job));
                         break;
                     case "4":
-                        //what if already started?
                         System.out.println("You've chosen to start." +
                                 "\nProcessing your request.");
                         print.start();
@@ -83,19 +78,19 @@ public class Client {
                         break;
                     case "8":
                         System.out.println("You've chosen to read config." +
-                                "\nProcessing your request.");
-                        System.out.println("Please enter the parameter you want read.");
+                                "\nPlease enter the parameter you want read.");
                         String parameter = scanner.nextLine();
+                        System.out.println("Thank you. Processing your request.");
                         String parameterRead = print.readConfig(parameter);
-                        System.out.println("The value of the chosen parameter is " + parameterRead + ".");
+                        System.out.println(parameterRead);
                         break;
                     case "9":
                         System.out.println("You've chosen to set config." +
-                                "\nProcessing your request.");
-                        System.out.println("Please enter the parameter you want read.");
+                                "\nPlease enter the parameter you want set.");
                         String parameter2 = scanner.nextLine();
                         System.out.println("Thank you. Now please enter the value you want it to be.");
                         String value = scanner.nextLine();
+                        System.out.println("Thank you. Processing your request.");
                         print.setConfig(parameter2, value);
                         break;
                     default:
