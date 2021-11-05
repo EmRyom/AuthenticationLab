@@ -13,6 +13,7 @@ public class Client {
         System.out.println("---" + print.echo("Hey server") + " " + print.getClass().getName());
         Scanner scanner = new Scanner(System.in);
         String authenticationString = "None";
+        String username = "";
         while (true) {
             if (!authenticationString.equals("None")) {
                 System.out.println("Congratulations on being authenticated and welcome to the printer server." +
@@ -36,14 +37,14 @@ public class Client {
                         System.out.println("Thank you. Now please enter the desired printer.");
                         String printer = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        print.print(filename, printer);
+                        System.out.println(print.print(username, filename, printer));
                         break;
                     case "2":
                         System.out.println("You've chosen to queue." +
                                 "\nPlease enter the printer you wish to see the queue of.");
                         String printer2 = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        System.out.println(print.queue(printer2));
+                        System.out.println(print.queue(username, printer2));
                         break;
                     case "3":
                         System.out.println("You've chosen to top queue." +
@@ -52,37 +53,36 @@ public class Client {
                         System.out.println("Thank you. Now please enter the job number.");
                         int job = Integer.parseInt(scanner.nextLine());
                         System.out.println("Thank you. Processing your request.");
-                        System.out.println(print.topQueue(printer3, job));
+                        System.out.println(print.topQueue(username, printer3, job));
                         break;
                     case "4":
                         System.out.println("You've chosen to start." +
                                 "\nProcessing your request.");
-                        print.start();
+                        System.out.println(print.start(username));
                         break;
                     case "5":
                         System.out.println("You've chosen to stop." +
                                 "\nProcessing your request.");
-                        print.stop();
+                        System.out.println(print.stop(username));
                         break;
                     case "6":
                         System.out.println("You've chosen to restart." +
                                 "\nProcessing your request.");
-                        print.restart();
+                        System.out.println(print.restart(username));
                         break;
                     case "7":
                         System.out.println("You've chosen to status." +
                                 "\nPlease enter the printer you wish to check status on.");
                         printer3 = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        System.out.println(print.status(printer3));
+                        System.out.println(print.status(username, printer3));
                         break;
                     case "8":
                         System.out.println("You've chosen to read config." +
                                 "\nPlease enter the parameter you want read.");
                         String parameter = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        String parameterRead = print.readConfig(parameter);
-                        System.out.println(parameterRead);
+                        System.out.println(print.readConfig(username, parameter));
                         break;
                     case "9":
                         System.out.println("You've chosen to set config." +
@@ -91,7 +91,7 @@ public class Client {
                         System.out.println("Thank you. Now please enter the value you want it to be.");
                         String value = scanner.nextLine();
                         System.out.println("Thank you. Processing your request.");
-                        print.setConfig(parameter2, value);
+                        System.out.println(print.setConfig(username, parameter2, value));
                         break;
                     default:
                         System.out.println("You did not enter a correct option. Please try again.");
@@ -101,7 +101,7 @@ public class Client {
             } else {
                 System.out.println("You are currently not authenticated." +
                         "\nPlease enter your username:");
-                String username = scanner.nextLine();
+                username = scanner.nextLine();
                 System.out.println("Thank you. Now please enter your password");
                 String password = scanner.nextLine();
                 System.out.println("Thank you. Processing your authentication.");
