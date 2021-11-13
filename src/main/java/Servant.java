@@ -18,7 +18,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     ArrayList<Printer> printers = new ArrayList<>();
     HashMap<String,String> parameters= new HashMap<String,String>();
-    HashMap<String,String> users = new HashMap<>();
+    HashMap<String,String[]> users = new HashMap<>();
     HashMap<String,String[]> permissions = new HashMap<String,String[]>();
 
 
@@ -31,24 +31,30 @@ public class Servant extends UnicastRemoteObject implements Print {
         }
         return -1;
     }
+    
+    private Boolean hasPermission (String user, String action) {
+        String[] roles = users.get(user);
+        for (int i = 0; i < roles.length; i++) {
+            if (Arrays.asList(permissions.get(Arrays.asList(roles).get(i))).contains(action)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void loadAccessList() throws IOException {
         String line;
-        Boolean loading = false;
+        
         BufferedReader reader = new BufferedReader(new FileReader("../resources/passwords.txt"));
         while ((line = reader.readLine())!=null) {
             String[] splitStr = line.split("\\s+");
-            if (loading) {
-                permissions.put(splitStr[0],Arrays.copyOfRange(splitStr,1,splitStr.length));
-            }
-            if (!loading && !splitStr[0].equals(":")) {
-                users.put(splitStr[0],splitStr[1]);
-            }
-            if (splitStr[0].equals(":")) {
-                loading = true;
-            }
+            users.put(splitStr[0], Arrays.copyOfRange(splitStr, 2, splitStr.length));
         }
-
+        reader = new BufferedReader(new FileReader("../resources/policyfile.txt"));
+        while ((line = reader.readLine())!=null) {
+            String[] splitStr = line.split("\\s+");
+            permissions.put(splitStr[0], Arrays.copyOfRange(splitStr, 1, splitStr.length));
+        }
     }
 
     public Servant() throws IOException {
@@ -62,7 +68,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String print(String user, String filename, String printer) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("print")) {
+        if (hasPermission(user,"print")) {
             int i = FindPrinter(printer);
             if (i==-1) {
                 Printer p = new Printer(printer);
@@ -80,7 +86,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String queue(String user, String printer) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("queue")) {
+        if (hasPermission(user,"queue")) {
             System.out.println("Queue: "+printer);
             int u = FindPrinter(printer);
             if (u==-1) {
@@ -100,7 +106,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String topQueue(String user, String printer, int job) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("topQueue")) {
+        if (hasPermission(user,"topQueue")) {
             System.out.println("Top queue for job "+job+" on "+printer+" was demanded");
             int i = FindPrinter(printer);
             if (i==-1) {
@@ -120,7 +126,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String start(String user) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("start")) {
+        if (hasPermission(user,"start")) {
             System.out.println("Start server (connecting to printer1, printer2 and printer3)");
             Printer p1 = new Printer("printer1");
             Printer p2 = new Printer("printer2");
@@ -137,7 +143,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String stop(String user) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("stop")) {
+        if (hasPermission(user,"stop")) {
             printers = new ArrayList<>();
             System.out.println("Stop server (Disconnecting from all printers)");
             return "Stop successful";
@@ -148,7 +154,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String restart(String user) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("restart")) {
+        if (hasPermission(user,"restart")) {
             printers = new ArrayList<>();
             Printer p1 = new Printer("printer1");
             Printer p2 = new Printer("printer2");
@@ -165,7 +171,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String status(String user, String printer) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("status")) {
+        if (hasPermission(user,"status")) {
             System.out.println("Status: "+printer);
             int i = FindPrinter(printer);
             if (i==-1) {
@@ -180,7 +186,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String readConfig(String user, String parameter) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("readConfig")) {
+        if (hasPermission(user,"readConfig")) {
             System.out.println("Read config: "+parameter);
             String out = parameters.get(parameter);
             if (out!=null) {
@@ -196,7 +202,7 @@ public class Servant extends UnicastRemoteObject implements Print {
 
     @Override
     public String setConfig(String user, String parameter, String value) throws RemoteException {
-        if (Arrays.asList(permissions.get(users.get(user))).contains("setConfig")) {
+        if (hasPermission(user,"setConfig")) {
             System.out.println("Set config: "+parameter+" to "+value);
             parameters.put(parameter,value);
             return "Parameter "+parameter+" set to "+value;
@@ -235,7 +241,7 @@ public class Servant extends UnicastRemoteObject implements Print {
                     bufferedReader.close();
                     //String bCryptPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
                     //System.out.println(bCryptPassword + " password");
-                    Boolean comparePasswords = BCrypt.checkpw(password, splitStr[2]);
+                    Boolean comparePasswords = BCrypt.checkpw(password, splitStr[1]);
                     if (comparePasswords) {
                         System.out.println("Input credentials correct. User authenticated.");
                         return true;
