@@ -8,7 +8,9 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.mindrot.jbcrypt.BCrypt;
@@ -34,17 +36,36 @@ public class Servant extends UnicastRemoteObject implements Print {
     
     private Boolean hasPermission (String user, String action) {
         String[] roles = users.get(user);
+        boolean rec = false;
         for (int i = 0; i < roles.length; i++) {
-            if (Arrays.asList(permissions.get(Arrays.asList(roles).get(i))).contains(action)) {
-                return true;
+            if (recursivePermission(Arrays.asList(roles).get(i), action)) {
+                rec = true;
             }
         }
-        return false;
+        return  rec;
     }
 
-    public void loadAccessList() throws IOException {
+    private Boolean recursivePermission (String role, String action) {
+        String[] p = permissions.get(role);
+        Set<String> k = permissions.keySet();
+        if (Arrays.asList(p).contains(action)) {
+            return true;
+        }
+        boolean rec = false;
+        for (String e : p) {
+            for (String key : k) {
+                if (e.equals(key)) {
+                    if (recursivePermission(key, action)) {
+                        rec = true;
+                    }
+                }
+            }
+        }
+        return rec;
+    }
+
+    private void loadAccessList() throws IOException {
         String line;
-        
         BufferedReader reader = new BufferedReader(new FileReader("../resources/passwords.txt"));
         while ((line = reader.readLine())!=null) {
             String[] splitStr = line.split("\\s+");
