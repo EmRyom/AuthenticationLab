@@ -97,7 +97,7 @@ public class Servant extends UnicastRemoteObject implements Print {
     @Override
     public String topQueue(String user, String printer, int job) throws RemoteException {
         if (hasPermission(user,"topQueue")) {
-            System.out.println("Top queue for job "+job+" on "+printer+" was demanded");
+            System.out.println("Top queue");
             return "Top queue successful";
         } else {
             return "You do not have permission to topQueue";
